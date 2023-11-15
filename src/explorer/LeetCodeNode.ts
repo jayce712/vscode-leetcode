@@ -68,4 +68,7 @@ export class LeetCodeNode {
         });
     }
 
+    public get children(): string[] {
+        return this.data.children || [];
+    }
 }

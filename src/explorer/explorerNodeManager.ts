@@ -8,6 +8,7 @@ import { getSortingStrategy } from "../commands/plugin";
 import { Category, defaultProblem, ProblemState, SortingStrategy } from "../shared";
 import { shouldHideSolvedProblem } from "../utils/settingUtils";
 import { LeetCodeNode } from "./LeetCodeNode";
+import { LEET_CODE_75 } from './config';
 
 class ExplorerNodeManager implements Disposable {
     private explorerNodeMap: Map<string, LeetCodeNode> = new Map<string, LeetCodeNode>();
@@ -52,6 +53,10 @@ class ExplorerNodeManager implements Disposable {
             new LeetCodeNode(Object.assign({}, defaultProblem, {
                 id: Category.Favorite,
                 name: Category.Favorite,
+            }), false),
+            new LeetCodeNode(Object.assign({}, defaultProblem, {
+                id: Category.Study75,
+                name: Category.Study75,
             }), false),
         ];
     }
@@ -120,31 +125,50 @@ class ExplorerNodeManager implements Disposable {
         return this.applySortingStrategy(res);
     }
 
-    public getChildrenNodesById(id: string): LeetCodeNode[] {
-        // The sub-category node's id is named as {Category.SubName}
-        const metaInfo: string[] = id.split(".");
+    public getStudy75Nodes(): LeetCodeNode[] {
         const res: LeetCodeNode[] = [];
-        for (const node of this.explorerNodeMap.values()) {
-            switch (metaInfo[0]) {
-                case Category.Company:
-                    if (node.companies.indexOf(metaInfo[1]) >= 0) {
-                        res.push(node);
-                    }
-                    break;
-                case Category.Difficulty:
-                    if (node.difficulty === metaInfo[1]) {
-                        res.push(node);
-                    }
-                    break;
-                case Category.Tag:
-                    if (node.tags.indexOf(metaInfo[1]) >= 0) {
-                        res.push(node);
-                    }
-                    break;
-                default:
-                    break;
+        for (const node of LEET_CODE_75) {
+            res.push(new LeetCodeNode(Object.assign({}, defaultProblem, node), false));
+        }
+        return res;
+    }
+
+    public getChildrenNodesById(element: LeetCodeNode): LeetCodeNode[] {
+        // The sub-category node's id is named as {Category.SubName}
+        const { id, children } = element;
+        const res: LeetCodeNode[] = [];
+
+        if (Array.isArray(children) && children.length) {
+            children.forEach(id => {
+                if (this.explorerNodeMap.has(id)) {
+                    res.push(this.explorerNodeMap.get(id)!);
+                }
+            });
+        } else {
+            const metaInfo: string[] = id.split(".");
+            for (const node of this.explorerNodeMap.values()) {
+                switch (metaInfo[0]) {
+                    case Category.Company:
+                        if (node.companies.indexOf(metaInfo[1]) >= 0) {
+                            res.push(node);
+                        }
+                        break;
+                    case Category.Difficulty:
+                        if (node.difficulty === metaInfo[1]) {
+                            res.push(node);
+                        }
+                        break;
+                    case Category.Tag:
+                        if (node.tags.indexOf(metaInfo[1]) >= 0) {
+                            res.push(node);
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         }
+
         return this.applySortingStrategy(res);
     }
 

@@ -79,11 +79,13 @@ export class LeetCodeTreeDataProvider implements vscode.TreeDataProvider<LeetCod
                     return explorerNodeManager.getAllTagNodes();
                 case Category.Company:
                     return explorerNodeManager.getAllCompanyNodes();
+                case Category.Study75:
+                    return explorerNodeManager.getStudy75Nodes();
                 default:
                     if (element.isProblem) {
                         return [];
                     }
-                    return explorerNodeManager.getChildrenNodesById(element.id);
+                    return explorerNodeManager.getChildrenNodesById(element);
             }
         }
     }
@@ -113,11 +115,11 @@ export class LeetCodeTreeDataProvider implements vscode.TreeDataProvider<LeetCod
             return "";
         }
 
-        const childernNodes: LeetCodeNode[] = explorerNodeManager.getChildrenNodesById(element.id);
+        const childrenNodes: LeetCodeNode[] = explorerNodeManager.getChildrenNodesById(element);
 
         let acceptedNum: number = 0;
         let failedNum: number = 0;
-        for (const node of childernNodes) {
+        for (const node of childrenNodes) {
             switch (node.state) {
                 case ProblemState.AC:
                     acceptedNum++;
@@ -133,7 +135,7 @@ export class LeetCodeTreeDataProvider implements vscode.TreeDataProvider<LeetCod
         return [
             `AC: ${acceptedNum}`,
             `Failed: ${failedNum}`,
-            `Total: ${childernNodes.length}`,
+            `Total: ${childrenNodes.length}`,
         ].join(os.EOL);
     }
 }
